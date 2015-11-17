@@ -1,0 +1,74 @@
+<html>
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="http://code.jquery.com/qunit/qunit-1.20.0.js"></script>
+  <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
+  <script src="tasks.js"></script>
+  <script src="handlebars.js"></script>
+  
+<script id="task-template" type="text/x-handlebars-template">
+  {{#each tasks}}
+	  <div class="task">
+		{{Description}}<br>
+		complexity: {{Complexity}}<br>
+		priority: {{Priority}}<br>
+		Status: {{Status}}<br>
+		<input type="button" value="Delete" onclick="deleteTask('{{@key}}')">
+		<hr>
+	  </div>
+  {{/each}}
+</script>
+  
+<script>
+function bodyOnLoad()
+{
+	//load list of tasks
+	var db = new Tasks().GetFirebase();
+
+	db.on("value", function(snapshot) {
+		myList = snapshot.val();
+		
+		var html    = "write code to convert myList into HTML";
+		// google for handlebars.js
+		
+		document.getElementById("divTasks").innerHTML = html;
+		
+	}, function (errorObject) {
+		console.log("The read failed: " + errorObject.code);
+	});		
+}
+
+function deleteTask(strRecordID)
+{
+	var tasks = new Tasks();
+	tasks.Delete(strRecordID);
+}
+
+function addTask()
+{
+	var strTask = document.getElementById("txtTask").value;
+	var strComplexity = document.getElementById("txtComplexity").value;
+	var strPriority = document.getElementById("txtPriority").value;
+	var aTask = new Task();
+	aTask.Description = strTask;
+	aTask.Complexity = parseInt(strComplexity);
+	aTask.Priority = parseInt(strPriority);
+	
+	var tasks = new Tasks();
+	tasks.Add(aTask);
+	
+	
+}
+</script>
+</head>
+<body onload="bodyOnLoad()">
+<div>
+Description: <input id="txtTask">
+Complexity: <input id="txtComplexity">
+Priority: <input id="txtPriority">
+<input type="button" value="Add Task" onclick="addTask()">
+</div>
+<hr>
+<div id="divTasks"></div>
+</body>
+</html>
